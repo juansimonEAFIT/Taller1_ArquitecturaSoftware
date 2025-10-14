@@ -1,0 +1,65 @@
+Revisión de Calidad – Proyecto 
+
+USABILIDAD
+- Lo que veo bien:
+  - Formularios con django-crispy-forms y Bootstrap: la interfaz se ve consistente y ordenada.
+  - Catálogo con paginación y filtros: facilita encontrar productos.
+  - Separación de roles (cliente/empresa/admin) en los flujos básicos.
+- Lo que yo mejoraría rápido:
+  - Mostrar productos a visitantes (no autenticados) para evitar una “pantalla vacía”.
+  - Mensajes de feedback (éxito/error) cuando se hacen acciones como cambiar el estado de un pedido.
+  - Ajustar idioma a español y revisar accesibilidad mínima (labels, contraste, navegación por teclado).
+- Inversión sugerida:
+  - Rápida: activar messages de Django en acciones clave y habilitar un home público con productos destacados.
+  - Media: migrar a Bootstrap 5 y pasar una checklist de accesibilidad básica.
+  - Alta: pruebas con usuarios y refinamiento de navegación/búsqueda.
+
+COMPATIBILIDAD
+- Lo que veo bien:
+  - Django 4.2 LTS y dependencias con versiones fijas.
+  - Bootstrap ayuda a mantener compatibilidad en navegadores comunes.
+- Oportunidades claras:
+  - Ajustar configuración de archivos: posible error en MEDIA_URL (debería ser “media/”).
+  - Preparar entorno de despliegue: definir ALLOWED_HOSTS y servir estáticos correctamente.
+  - Para producción real, cambiar de SQLite a PostgreSQL.
+- Inversión sugerida:
+  - Rápida: corregir MEDIA_URL y configurar ALLOWED_HOSTS por entorno.
+  - Media: usar Whitenoise para estáticos y manejar variables sensibles con .env.
+  - Alta: Docker/CI-CD y, si crece, un CDN para estáticos/media.
+
+RENDIMIENTO
+- Lo que ya ayuda:
+  - Paginación en el catálogo evita cargar listas enormes.
+  - Entrega de PDFs con streaming (FileResponse).
+- Donde veo mejora:
+  - Prevenir N+1 queries: usar select_related/prefetch_related en listados y detalle.
+  - Agregar índices a campos usados para filtrar/ordenar (precio, stock, is_on_sale, created_at, categoría; y en pedidos: empresa/estado).
+  - Cachear páginas o fragmentos muy visitados; optimizar imágenes (miniaturas/WebP) en listados.
+- Inversión sugerida:
+  - Rápida: añadir select_related/prefetch_related en consultas frecuentes.
+  - Media: migraciones para índices y cache por vista/fragmento.
+  - Alta: CDN y pipeline de imágenes/miniaturas.
+
+SEGURIDAD
+- Lo positivo:
+  - CSRF activo, middlewares de seguridad y validadores de contraseña.
+  - Modelo de usuario propio con roles definidos.
+- Riesgos que yo atendería ya:
+  - DEBUG=True y SECRET_KEY en el settings del repo; ALLOWED_HOSTS vacío. Mover a variables de entorno y desactivar DEBUG en producción.
+  - Descarga de recibos PDF: proteger mejor. Debe exigir login y verificar que el pedido pertenece al usuario autenticado (no por nombre, sino por relación con su usuario) o que el rol tenga permiso. Hay riesgo de acceso indebido (IDOR).
+  - Endurecer cabeceras/cookies en producción (HSTS, Secure/HttpOnly, X-Frame-Options, CSP) y registrar acciones sensibles.
+  - Considerar limitar intentos de login (rate limiting).
+- Inversión sugerida:
+  - Rápida: proteger la vista de PDF con @login_required y autorización por propietario/rol; pasar SECRET_KEY/DEBUG/ALLOWED_HOSTS a .env.
+  - Media: activar cookies/cabeceras seguras y logging/auditoría de accesos a recursos sensibles.
+  - Alta: 2FA para roles críticos y escaneos automáticos de seguridad en CI.
+
+PRIORIDADES
+1) Variables de entorno: mover SECRET_KEY/DEBUG/ALLOWED_HOSTS a .env y dejar DEBUG=False en producción.
+2) Medios/estáticos: corregir MEDIA_URL y configurar el servido de estáticos para despliegue.
+3) Control de acceso a PDFs: exigir login y verificar propiedad/rol antes de entregar el archivo.
+4) Consultas: aplicar select_related/prefetch_related e índices en campos de filtro/orden.
+5) UX básica: mostrar catálogo a visitantes y usar mensajes de feedback en acciones.
+
+Cierre
+El proyecto tiene buena base (Django LTS, crispy, paginación). Con los quick wins de arriba queda mucho más sólido para seguir construyendo. Si se aprueba, puedo empezar por seguridad (PDF + .env), luego rendimiento (select_related + índices) y finalmente usabilidad (home público + mensajes).

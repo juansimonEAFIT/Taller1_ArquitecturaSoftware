@@ -1,0 +1,74 @@
+{% extends "items/base.html" %}
+
+
+{% block stylesheets %}
+{{block.super}}
+<style>
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  .profile-info {
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 2rem;
+  }
+  .profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+  .profile-actions .btn {
+    min-width: 160px;
+  }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<header class="bg-dark py-5">
+  <div class="container px-4 px-lg-5">
+      <div class="text-center text-white">
+          <h1 class="display-6">Profile</h1>
+      </div>
+  </div>
+</header>
+
+<section style="background-color: #f4f5f7;">
+  <div class="container py-5 h-100">
+    <div class="profile-header">
+      <div>
+        <h2 class="fw-bold">@{{ user.nombre }}</h2>
+        <span class="text-muted">{{ user.nombre }}</span>
+      </div>
+      <div class="profile-actions">
+        <a href="{% url 'user_profile:purchases' %}" class="btn btn-secondary">Ver historial de compras</a>
+        <a href="{% url 'user_profile:edit_profile' %}" class="btn btn-primary">Editar perfil</a>
+      </div>
+    </div>
+    <div class="profile-info">
+      <h5 class="mb-3">Información</h5>
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <strong>Email:</strong>
+          <p class="text-muted mb-0">{{ user.correo }}</p>
+        </div>
+      </div>
+      <h5 class="mb-3">Historial</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <strong>Compras:</strong>
+          <p class="text-muted mb-0">Lorem ipsum</p>
+        </div>
+        <div class="col-md-6">
+          <strong>Más visto:</strong>
+          <p class="text-muted mb-0">Dolor sit amet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,53 @@
+{% extends "items/base.html" %}
+
+{% block content %}
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5">
+        <div class="text-center text-white">
+            <h1 class="display-6">Purchase history</h1>
+        </div>
+    </div>
+</header>
+<ul class="list-group list-group-light px-6 py-3">
+    {% for receipt in receipts %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+        <div class="fw-bold">@{{ receipt.buyer }}</div>
+        <div class="text-muted">{{ receipt.date }}</div>
+      </div>
+      <div>
+        <ul>
+        {% for item in receipt.receipt_items %}
+            <li>{{ item.title }}</li>
+        {% endfor %}
+        </ul>
+      </div>
+      <span class="badge bg-success fs-6">Total: ${{ receipt.total }}</span>
+    </li>
+    {% endfor %}
+</ul>
+
+<h3 class="mt-5">Pedidos recientes</h3>
+<ul class="list-group list-group-light px-6 py-3">
+    {% for pedido in pedidos %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+        <div class="fw-bold">Pedido #{{ pedido.id }} - {{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</div>
+        <div class="text-muted">Estado: {{ pedido.get_estado_display }}</div>
+        <div>Empresa encargada: {{ pedido.empresa_encargada }}</div>
+        <div>Dirección: {{ pedido.direccion_envio }}</div>
+      </div>
+      <div>
+        <ul>
+        {% for item in pedido.pedidoitem_set.all %}
+            <li>{{ item.item.title }} x{{ item.cantidad }}</li>
+        {% endfor %}
+        </ul>
+      </div>
+      {% if pedido.recibo_pdf %}
+      <a href="{% url 'items:pedido_recibo_pdf' pedido.id %}" target="_blank" class="btn btn-outline-success">Descargar recibo PDF</a>
+      {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock content %}
